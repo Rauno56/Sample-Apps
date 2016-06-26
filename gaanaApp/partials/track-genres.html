@@ -1,0 +1,25 @@
+<div class="gaana-container" ng-init="init()">
+    <div class="page-heading">
+        Genres List
+    </div>
+    <div class="genres-container">
+        <button class="btn btn-primary" ng-click="navigateBack()">
+            <i class="fa fa-reply" style="color: #fff">
+            </i>
+            Back
+        </button>
+        <div id="genres-list" ng-if="trackGenres && trackGenres.length > 0">
+            <div class="genre-div" ng-repeat="genre in trackGenres | startFrom:currentPage*pageSize | limitTo:pageSize">
+                <div class="genre-name-container">
+                    <span class="genre-text-name">
+                        {{genre.name}}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-if="trackGenres && trackGenres.length > 0">
+        <pagination-control current-page="currentPage" page-size="pageSize" total-data="trackGenres">
+        </pagination-control>
+    </div>
+</div>

@@ -1,3 +1,294 @@
-<div>
-    Tracks List
+<div class="gaana-container" ng-init="init()">
+    <div class="page-heading">
+        Tracks List
+    </div>
+    <div class="tracks-container">
+        <div class="search-container">
+            <input class="form-control" name="searchContainer" ng-blur="searchTrackByTitle()" ng-model="trackToSearch" placeholder="Enter Track's Name, Press <tab> to search..." type="text">
+            </input>
+        </div>
+        <div ng-hide="tracksList !== null" style="margin-top:16px;">
+            <p class="alert alert-info" style="padding-top:6px;padding-bottom:6px">
+                <i class="fa fa-spinner fa-spin">
+                </i>
+                Loading Tracks... It might take a while!
+            </p>
+        </div>
+        <div id="tracks-list" ng-if="tracksList && tracksList.length > 0">
+            <button class="btn btn-primary new-button" ng-click="showHideNewTrackDialog()">
+                <i class="fa fa-plus">
+                </i>
+                Add New
+            </button>
+            <div class="new-track-dialog" ng-show="bNewTrack">
+                <form name="newTrackForm">
+                    <label class="new-track-heading">
+                        Add New Track
+                    </label>
+                    <div class="new-track-field-row">
+                        <div>
+                            <label>
+                                Title
+                            </label>
+                        </div>
+                        <div>
+                            <input name="title" ng-model="newTrack.title" placeholder="Title" required="" style="color: black;" type="text">
+                            </input>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="new-track-field-row">
+                        <div>
+                            <label>
+                                Genre
+                            </label>
+                        </div>
+                        <div>
+                            <select multiple="" name="genres" ng-model="newTrack.genres" ng-multiple="true" ng-options="genre.name for genre in genresList" style="color: black">
+                                <ui-select-choices repeat="genre.id for genre in genresList">
+                                    {{genre.name}}
+                                </ui-select-choices>
+                            </select>
+                            <input name="genre" ng-model="newTrack.genres" placeholder="Genre" required="" style="color: black;" type="text">
+                            </input>
+                        </div>
+                    </div>
+                    -->
+                    <div class="new-track-field-row">
+                        <div>
+                            <label>
+                                Rating
+                            </label>
+                        </div>
+                        <div>
+                            <input name="rating" ng-model="newTrack.rating" placeholder="Rating" required="" style="color: black;" type="text">
+                            </input>
+                        </div>
+                    </div>
+                    <button class="btn btn-success col-md-12 col-sm-12 col-xs-12" ng-click="addNewTrack()" ng-disabled="newTrackForm.$error.required" style="margin-top: 30px;">
+                        <i class="fa fa-save">
+                        </i>
+                        Save
+                    </button>
+                </form>
+            </div>
+            <div class="new-track-dialog" ng-show="bEditTrack">
+                <form name="editTrackForm">
+                    <label class="new-track-heading">
+                        Edit Track - {{editTrackObject.title}}
+                    </label>
+                    <div class="new-track-field-row">
+                        <div>
+                            <label>
+                                Title
+                            </label>
+                        </div>
+                        <div>
+                            <input name="title" ng-model="editTrackObject.title" placeholder="Title" required="" style="color: black;" type="text">
+                            </input>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="new-track-field-row">
+                        <div>
+                            <label>
+                                Genre
+                            </label>
+                        </div>
+                        <div>
+                            <select multiple="" name="genres" ng-model="editTrackObject.genres" ng-multiple="true" ng-options="genre.name for genre in genresList" style="color: black">
+                                <ui-select-choices repeat="genre.id as genre in genresList">
+                                    {{genre.name}}
+                                </ui-select-choices>
+                            </select>
+                            <input name="genre" ng-model="editTrackObject.genres" placeholder="Genre" required="" style="color: black;" type="text">
+                            </input>
+                        </div>
+                    </div>
+                    -->
+                    <div class="new-track-field-row">
+                        <div>
+                            <label>
+                                Rating
+                            </label>
+                        </div>
+                        <div>
+                            <input name="rating" ng-model="editTrackObject.rating" placeholder="Rating" required="" style="color: black;" type="text">
+                            </input>
+                        </div>
+                    </div>
+                    <button class="btn btn-success col-md-12 col-sm-12 col-xs-12" ng-click="editTrack()" ng-disabled="editTrackForm.$error.required" style="margin-top: 30px;">
+                        <i class="fa fa-save">
+                        </i>
+                        Save
+                    </button>
+                </form>
+            </div>
+            <div class="track-item" ng-repeat="track in tracksList | startFrom:currentPage*pageSize | limitTo:pageSize">
+                <div class="track-div" ng-click="showGenreView(track.genres)">
+                    <div class="track-name-container">
+                        <span class="track-text-name">
+                            {{track.title}}
+                        </span>
+                        <span ng-show="track.genres.length > 0">
+                            [
+                        </span>
+                        <span ng-repeat="genre in track.genres track by $index">
+                            <span ng-show="$index === 0">
+                                {{genre.name}}
+                            </span>
+                            <span ng-show="$index > 0">
+                                | {{genre.name}}
+                            </span>
+                        </span>
+                        <span ng-show="track.genres.length > 0">
+                            ]
+                        </span>
+                    </div>
+                    <div class="track-ratings">
+                        <div ng-show="track.rating === '0.0'">
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating > '0.0' && track.rating < '1.0'">
+                            <i class="fa fa-star-half-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating === '1.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating > '1.0' && track.rating < '2.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star-half-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating === '2.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating > '2.0' && track.rating < '3.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star-half-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating === '3.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating > '3.0' && track.rating < '4.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star-half-o">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating === '4.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating > '4.0' && track.rating < '5.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star-half-o">
+                            </i>
+                        </div>
+                        <div ng-show="track.rating === '5.0' || track.rating > '5.0'">
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                            <i class="fa fa-star">
+                            </i>
+                        </div>
+                    </div>
+                </div>
+                <div class="edit-icon" ng-click="showEditTrackDialog(track)">
+                    <i class="fa fa-edit">
+                    </i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-if="tracksList && tracksList.length > 0">
+        <pagination-control current-page="currentPage" page-size="pageSize" total-data="tracksList">
+        </pagination-control>
+    </div>
 </div>

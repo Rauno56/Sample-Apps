@@ -1,0 +1,11 @@
+<div id="page-navigation">
+    <button class="btn btn-primary" ng-click="showPrevPage()" ng-disabled="currentPage === 0">
+        Previous
+    </button>
+    <span id="page-number">
+        {{currentPage+1}}/{{getNumberOfPages()}}
+    </span>
+    <button class="btn btn-primary" ng-click="showNextPage()" ng-disabled="currentPage >= totalData.length/pageSize - 1">
+        Next
+    </button>
+</div>

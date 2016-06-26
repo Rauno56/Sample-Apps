@@ -1,3 +1,84 @@
-<div>
-    Genres List
+<div class="gaana-container" ng-init="init()">
+    <div class="page-heading">
+        Genres List
+    </div>
+    <div class="genres-container">
+        <div class="col-md-12" ng-hide="genresList !== null" style="margin-top:16px;">
+            <p class="alert alert-info" style="padding-top:6px;padding-bottom:6px">
+                <i class="fa fa-spinner fa-spin">
+                </i>
+                Loading Genres... It might take a while!
+            </p>
+        </div>
+        <div id="genres-list" ng-if="genresList && genresList.length > 0">
+            <button class="btn btn-primary" ng-click="showHideNewGenreDialog()">
+                <i class="fa fa-plus">
+                </i>
+                Add New
+            </button>
+            <div class="new-genre-dialog" ng-show="bNewGenre">
+                <form name="newGenreForm">
+                    <label class="new-genre-heading">
+                        Add New Genre
+                    </label>
+                    <div class="new-genre-field-row">
+                        <div>
+                            <label>
+                                Name
+                            </label>
+                        </div>
+                        <div>
+                            <input name="title" ng-model="newGenre.name" placeholder="Name" required="" style="color: black;" type="text">
+                            </input>
+                        </div>
+                    </div>
+                    <button class="btn btn-success col-md-12 col-sm-12 col-xs-12" ng-click="addNewGenre()" ng-disabled="newGenreForm.$error.required" style="margin-top: 30px;">
+                        <i class="fa fa-save">
+                        </i>
+                        Save
+                    </button>
+                </form>
+            </div>
+            <div class="new-genre-dialog" ng-show="bEditGenre">
+                <form name="editGenreForm">
+                    <label class="new-genre-heading">
+                        Edit Genre - {{editGenreObject.name}}
+                    </label>
+                    <div class="new-genre-field-row">
+                        <div>
+                            <label>
+                                Name
+                            </label>
+                        </div>
+                        <div>
+                            <input name="title" ng-model="editGenreObject.name" placeholder="Name" required="" style="color: black;" type="text">
+                            </input>
+                        </div>
+                    </div>
+                    <button class="btn btn-success col-md-12 col-sm-12 col-xs-12" ng-click="editGenre()" ng-disabled="editGenreForm.$error.required" style="margin-top: 30px;">
+                        <i class="fa fa-save">
+                        </i>
+                        Save
+                    </button>
+                </form>
+            </div>
+            <div class="genre-item" ng-repeat="genre in genresList | startFrom:currentPage*pageSize | limitTo:pageSize">
+                <div class="genre-div">
+                    <div class="genre-name-container">
+                        <span class="genre-text-name">
+                            {{genre.name}}
+                        </span>
+                    </div>
+                </div>
+                <div class="edit-icon" ng-click="showEditGenreDialog(genre)">
+                    <i class="fa fa-edit">
+                    </i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-if="genresList && genresList.length > 0">
+        <pagination-control current-page="currentPage" page-size="pageSize" total-data="genresList">
+        </pagination-control>
+    </div>
 </div>
