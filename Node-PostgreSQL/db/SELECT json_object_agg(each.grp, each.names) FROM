@@ -1,9 +1,0 @@
-
-SELECT json_object_agg(each.grp, each.names) FROM (
-    SELECT grp, array_agg(name) as names FROM things GROUP BY grp
-) AS each;
-
-
-SELECT applications.id, json_object_agg(listings.id, listings.name,listings.description), applications.cover_letter 
-FROM applications, users, listings 
-WHERE users.id = applications.user_id and applications.listing_id = listings.id and users.id = " + userId + ""

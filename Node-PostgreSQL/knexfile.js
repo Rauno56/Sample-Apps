@@ -3,7 +3,7 @@ module.exports = {
         client: 'pg',
         connection: 'http://kijyyby7te:kauresuoaf@assignment.codsssqklool.eu-central-1.rds.amazonaws.com:5432/kijyyby7te_db',
         pool: {
-            min: 2,
+            min: 0,
             max: 7
         },
         acquireConnectionTimeout: 20000
@@ -12,7 +12,7 @@ module.exports = {
         client: 'pg',
         connection: 'http://kijyyby7te:kauresuoaf@assignment.codsssqklool.eu-central-1.rds.amazonaws.com:5432/kijyyby7te_db',
         pool: {
-            min: 2,
+            min: 0,
             max: 7
         },
         acquireConnectionTimeout: 20000
