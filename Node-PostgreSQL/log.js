@@ -3,7 +3,6 @@ var logFile = require('path').join(__dirname, 'serverLog.log');
 
 winston.add(winston.transports.File, {
     filename: logFile,
-    colorize: true
 });
 // comment below line if you want to stop console logs.
 // winston.remove(winston.transports.Console);
