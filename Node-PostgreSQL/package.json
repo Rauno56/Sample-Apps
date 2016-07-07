@@ -2,6 +2,7 @@
   "name": "mocha-chai-knex",
   "version": "0.0.0",
   "private": true,
+  "main": "./bin/www",
   "scripts": {
     "start": "supervisor ./bin/www"
   },
