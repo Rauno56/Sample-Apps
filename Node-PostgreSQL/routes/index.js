@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var logger = require('winston');
-var async = require('async');
 var queries = require('../db/queries');
 /*
  * GET Top Active Users
@@ -54,82 +53,62 @@ router.get('/users', function(req, res, next) {
         "body": {}
     };
     if (USER_ID) {
-        async.waterfall([
-            function(callback) {
-                var userData = null;
-                queries.getUserData(USER_ID).then(function(response) {
-                    userData = response.rows[0];
-                    if (userData) {
-                        callback(null, userData);
-                        logger.log('info', 'userData for', {
-                            'user_id': USER_ID,
-                            'userData': userData
-                        });
-                    } else {
-                        returnObject.error = "1";
-                        returnObject.message = "User Not Found!";
-                        res.status(200).json(returnObject);
-                        logger.log('error', 'user not found.', {
-                            'user_id': USER_ID,
-                            'userData': userData
-                        });
-                    }
-                }).catch(function(error) {
-                    next(error);
-                });
-            },
-            function(userData, callback) {
-                var applicationData = null;
-                queries.getUserApplications(USER_ID).then(function(response) {
-                    applicationData = response.rows;
-                    callback(null, userData, applicationData);
-                    logger.log('info', 'applicationData for', {
+        Promise.all([
+            queries.getUserData(USER_ID).then(function(response) {
+                userData = response.rows[0];
+                if (userData) {
+                    logger.log('info', 'userData for', {
                         'user_id': USER_ID,
-                        'applicationData': applicationData
+                        'userData': userData
                     });
-                }).catch(function(error) {
-                    next(error);
-                });
-            },
-            function(userData, applicationData, callback) {
-                var listingsData = null;
-                queries.getUserListings(USER_ID).then(function(response) {
-                    listingsData = response.rows;
-                    callback(null, userData, applicationData, listingsData);
-                    logger.log('info', 'listingsData for', {
+                    return userData;
+                } else {
+                    returnObject.error = "1";
+                    returnObject.message = "User Not Found!";
+                    res.status(200).json(returnObject);
+                    logger.log('error', 'user not found.', {
                         'user_id': USER_ID,
-                        'listingsData': listingsData
+                        'userData': userData
                     });
-                }).catch(function(error) {
-                    next(error);
+                }
+            }),
+            queries.getUserApplications(USER_ID).then(function(response) {
+                applicationData = response.rows;
+                logger.log('info', 'applicationData for', {
+                    'user_id': USER_ID,
+                    'applicationData': applicationData
                 });
-            },
-            function(userData, applicationData, listingsData, callback) {
-                var companyData = null;
-                queries.getUserCompanies(USER_ID).then(function(response) {
-                    companyData = response.rows;
-                    callback(null, userData, applicationData, listingsData, companyData);
-                    logger.log('info', 'companyData for', {
-                        'user_id': USER_ID,
-                        'companyData': companyData
-                    });
-                }).catch(function(error) {
-                    next(error);
+                return applicationData;
+            }),
+            queries.getUserListings(USER_ID).then(function(response) {
+                listingsData = response.rows;
+                logger.log('info', 'listingsData for', {
+                    'user_id': USER_ID,
+                    'listingsData': listingsData
                 });
-            }
-        ], function(err, userData, applicationData, listingsData, companyData) {
-            if (!err) {
+                return listingsData;
+            }),
+            queries.getUserCompanies(USER_ID).then(function(response) {
+                companyData = response.rows;
+                logger.log('info', 'companyData for', {
+                    'user_id': USER_ID,
+                    'companyData': companyData
+                });
+                return companyData;
+            }),
+        ]).then(function(data) {
+            if (!returnObject.error) {
                 returnObject.body = {
-                    id: userData.id,
-                    name: userData.name,
-                    created_at: userData.created_at,
-                    companies: companyData,
-                    createdListings: listingsData,
-                    applications: applicationData
+                    id: data[0].id,
+                    name: data[0].name,
+                    created_at: data[0].created_at,
+                    companies: data[3],
+                    createdListings: data[2],
+                    applications: data[1]
                 }
                 res.status(200).json(returnObject);
             }
-        });
+        }).catch(next);
     } else {
         returnObject.error = "1";
         returnObject.message = "USER_ID not defined!";
